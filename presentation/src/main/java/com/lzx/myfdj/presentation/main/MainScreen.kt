@@ -34,12 +34,9 @@ fun MainActivityScreen(
         val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
         val suggestionList by viewModel.suggestionList.collectAsStateWithLifecycle()
 
-        if (teamsByLeagueUiState is TeamsByLeagueUiState.Loading || allLeaguesUiState is AllLeaguesUiState.Loading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center).width(Dimensions.loaderSize))
-        }
         ManageTeamsByLeagueUiState(
             teamsByLeagueUiState = teamsByLeagueUiState,
-            onError = { Timber.e(it) },
+            onError = { ShowSnackBar(snackBarHostState, it ?: "") },
         )
         ManageAllLeaguesUiState(
             allLeaguesUiState = allLeaguesUiState,
@@ -50,6 +47,13 @@ fun MainActivityScreen(
             onSearchQueryChange = { viewModel.updateSearchQuery(it) },
             onClearSearchQueryClick = { viewModel.clearSearchQuery() },
         )
+        if (teamsByLeagueUiState is TeamsByLeagueUiState.Loading || allLeaguesUiState is AllLeaguesUiState.Loading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .width(Dimensions.loaderSize),
+            )
+        }
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
@@ -60,7 +64,7 @@ fun MainActivityScreen(
 @Composable
 private fun ManageTeamsByLeagueUiState(
     teamsByLeagueUiState: TeamsByLeagueUiState,
-    onError: (String?) -> Unit,
+    onError: @Composable (String?) -> Unit,
 ) {
     when (teamsByLeagueUiState) {
         is TeamsByLeagueUiState.Success -> {
@@ -68,6 +72,7 @@ private fun ManageTeamsByLeagueUiState(
         }
 
         is TeamsByLeagueUiState.Error -> {
+            Timber.e(teamsByLeagueUiState.throwable.message)
             onError(teamsByLeagueUiState.throwable.message)
         }
 
@@ -92,7 +97,7 @@ private fun ManageAllLeaguesUiState(
         is AllLeaguesUiState.Success -> {
             AutoCompleteTextField(
                 searchQuery = searchQuery,
-                suggestionList = suggestionList,//allLeaguesUiState.data,
+                suggestionList = suggestionList,
                 onItemClick = { onItemClick(it) },
                 suggestionItem = { Text(text = it) },
                 onSearchQueryChange = { onSearchQueryChange(it) },
@@ -101,6 +106,7 @@ private fun ManageAllLeaguesUiState(
         }
 
         is AllLeaguesUiState.Error -> {
+            Timber.e(allLeaguesUiState.throwable.message)
             onError(allLeaguesUiState.throwable.message)
         }
 

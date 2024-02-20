@@ -1,5 +1,6 @@
 package com.lzx.myfdj.data.di
 
+import com.lzx.myfdj.data.BuildConfig
 import com.lzx.myfdj.data.api.TheSportsDbApi
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -47,12 +48,9 @@ object RetrofitModule {
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.BASE_API_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(okHttpClient)
             .build()
     }
 }
-
-private const val API_KEY = "50130162"
-private const val BASE_URL = "https://www.thesportsdb.com/api/v1/json/$API_KEY/"

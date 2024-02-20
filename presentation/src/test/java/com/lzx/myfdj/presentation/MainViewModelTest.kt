@@ -6,7 +6,6 @@ import com.lzx.myfdj.domain.repository.LeagueRepository
 import com.lzx.myfdj.domain.usecase.GetAllLeaguesUseCase
 import com.lzx.myfdj.domain.usecase.GetTeamsByLeagueUseCase
 import com.lzx.myfdj.presentation.main.MainViewModel
-import com.lzx.myfdj.presentation.main.mapper.LeagueUiMapper
 import com.lzx.myfdj.presentation.main.mapper.TeamUiMapper
 import com.lzx.myfdj.presentation.main.model.AllLeaguesUiState
 import com.lzx.myfdj.presentation.main.model.TeamsByLeagueUiState
@@ -38,7 +37,6 @@ class MainViewModelTest {
     private lateinit var tested: MainViewModel
     private lateinit var getAllLeaguesUseCase: GetAllLeaguesUseCase
     private lateinit var getTeamsByLeagueUseCase: GetTeamsByLeagueUseCase
-    private lateinit var leagueUiMapper: LeagueUiMapper
     private lateinit var teamUiMapper: TeamUiMapper
     private lateinit var fakeLeagueRepository: FakeLeagueRepository
 
@@ -47,13 +45,11 @@ class MainViewModelTest {
         fakeLeagueRepository = FakeLeagueRepository()
         getAllLeaguesUseCase = GetAllLeaguesUseCase(fakeLeagueRepository)
         getTeamsByLeagueUseCase = mockk()
-        leagueUiMapper = LeagueUiMapper()
         teamUiMapper = TeamUiMapper()
 
         tested = MainViewModel(
             getAllLeaguesUseCase,
             getTeamsByLeagueUseCase,
-            leagueUiMapper,
             teamUiMapper,
             Dispatchers.Unconfined,
         )
@@ -84,7 +80,7 @@ class MainViewModelTest {
         // Then
         val result = tested.allLeaguesUiState.value
         assertEquals(
-            AllLeaguesUiState.Success(expectedLeagues.map { leagueUiMapper.map(it) }),
+            AllLeaguesUiState.Success(expectedLeagues.map { it.name }),
             result,
         )
         collectJob.cancel()
@@ -117,6 +113,41 @@ class MainViewModelTest {
                 tested.teamsByLeagueUiState.value,
             )
         }
+    }
+
+    @Test
+    fun `test update search query`() = runTest {
+        // Given
+        val leagueName = "Premier League"
+
+        // When
+        tested.updateSearchQuery(leagueName)
+
+        // Then
+        assertEquals(
+            leagueName,
+            tested.searchQuery.value,
+        )
+    }
+
+    @Test
+    fun `test clear search query and suggestion list`() = runTest {
+        // Given
+        val leagueName = "Premier League"
+
+        // When
+        tested.updateSearchQuery(leagueName)
+        tested.clearSearchQuery()
+
+        // Then
+        assertEquals(
+            "",
+            tested.searchQuery.value,
+        )
+        assertEquals(
+            emptyList<String>(),
+            tested.suggestionList.value,
+        )
     }
 
     inner class FakeLeagueRepository : LeagueRepository {

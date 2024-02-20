@@ -27,41 +27,34 @@ import com.lzx.myfdj.uicomponent.theme.MyFDJTheme
 @Composable
 fun AutoCompleteTextField(
     modifier: Modifier = Modifier,
+    searchQuery: String,
     suggestionList: List<String>,
     onItemClick: (String) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onClearSearchQueryClick: () -> Unit,
     suggestionItem: @Composable (String) -> Unit,
 ) {
-    var filteredSuggestions by rememberSaveable { mutableStateOf(emptyList<String>()) }
-    var query by rememberSaveable { mutableStateOf("") }
     var isSuggestionListVisible by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier.background(MaterialTheme.colorScheme.background),
     ) {
-        QuerySearchTextField(
+        SearchQueryTextField(
             modifier = Modifier.height(Dimensions.queryTextFieldHeight),
-            onQueryChanged = { queryChanged ->
-                query = queryChanged
-                filteredSuggestions = suggestionList.filter { suggestion ->
-                    suggestion.contains(
-                        other = queryChanged.trim(),
-                        ignoreCase = true,
-                    )
-                }
-                isSuggestionListVisible = queryChanged.isNotEmpty()
+            onSearchQueryChanged = {
+                onSearchQueryChange(it)
+                isSuggestionListVisible = it.isNotEmpty()
             },
-            onClearClick = {
-                query = ""
-                filteredSuggestions = emptyList()
+            onClearSearchQueryClick = {
+                onClearSearchQueryClick()
             },
-            query = query,
+            searchQuery = searchQuery,
         )
 
-        if (isSuggestionListVisible && filteredSuggestions.isNotEmpty()) {
+        if (isSuggestionListVisible && suggestionList.isNotEmpty()) {
             SuggestionList(
-                filteredSuggestions = filteredSuggestions,
+                suggestionList = suggestionList,
                 onItemClick = { suggestion ->
-                    query = suggestion
                     onItemClick(suggestion)
                     isSuggestionListVisible = false
                 },
@@ -74,7 +67,7 @@ fun AutoCompleteTextField(
 @Composable
 private fun SuggestionList(
     modifier: Modifier = Modifier,
-    filteredSuggestions: List<String>,
+    suggestionList: List<String>,
     onItemClick: (String) -> Unit,
     suggestionItem: @Composable (String) -> Unit,
 ) {
@@ -84,7 +77,7 @@ private fun SuggestionList(
         verticalArrangement = Arrangement.spacedBy(Dimensions.suggestionListPadding),
         modifier = modifier,
     ) {
-        items(filteredSuggestions) { suggestion ->
+        items(suggestionList) { suggestion ->
             Box(
                 Modifier
                     .padding(Dimensions.itemPadding)
@@ -105,8 +98,11 @@ private fun SuggestionList(
 private fun AutoCompleteTextFieldPreview() {
     MyFDJTheme {
         AutoCompleteTextField(
+            searchQuery = "",
+            onSearchQueryChange = {},
             suggestionList = listOf("PSG, Paris, Paris-Saint-Germain"),
             onItemClick = {},
+            onClearSearchQueryClick = {},
         ) {
             Text(text = it)
         }
@@ -118,7 +114,7 @@ private fun AutoCompleteTextFieldPreview() {
 private fun SuggestionListPreview() {
     MyFDJTheme {
         SuggestionList(
-            filteredSuggestions = listOf("PSG, Paris, Paris-Saint-Germain"),
+            suggestionList = listOf("PSG, Paris, Paris-Saint-Germain"),
             onItemClick = {},
         ) {
             Text(text = it)

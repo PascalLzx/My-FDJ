@@ -8,4 +8,5 @@ object Dimensions {
     val teamListPadding: Dp = 16.dp
     val itemPadding: Dp = 8.dp
     val suggestionListPadding: Dp = 12.dp
+    val loaderSize: Dp = 64.dp
 }

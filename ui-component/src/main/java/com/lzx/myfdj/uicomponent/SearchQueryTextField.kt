@@ -15,11 +15,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
-fun QuerySearchTextField(
+fun SearchQueryTextField(
     modifier: Modifier = Modifier,
-    query: String,
-    onClearClick: () -> Unit,
-    onQueryChanged: (String) -> Unit,
+    searchQuery: String,
+    onClearSearchQueryClick: () -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
 ) {
     OutlinedTextField(
         modifier = modifier
@@ -29,9 +29,9 @@ fun QuerySearchTextField(
                 text = stringResource(id = R.string.search_placeholder),
             )
         },
-        value = query,
+        value = searchQuery,
         onValueChange = {
-            onQueryChanged(it)
+            onSearchQueryChanged(it)
         },
         singleLine = true,
         leadingIcon = {
@@ -39,7 +39,7 @@ fun QuerySearchTextField(
         },
         trailingIcon = {
             IconButton(onClick = {
-                onClearClick()
+                onClearSearchQueryClick()
             }) {
                 Icon(imageVector = Icons.Filled.Close, contentDescription = "Clear")
             }

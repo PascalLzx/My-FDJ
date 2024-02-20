@@ -13,13 +13,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lzx.myfdj.presentation.main.model.AllLeaguesUiState
 import com.lzx.myfdj.presentation.main.model.TeamsByLeagueUiState
 import com.lzx.myfdj.uicomponent.AutoCompleteTextField
 import com.lzx.myfdj.uicomponent.TeamList
+import com.lzx.myfdj.uicomponent.theme.Dimensions
 import timber.log.Timber
 
 @Composable
@@ -31,9 +31,11 @@ fun MainActivityScreen(
         val snackBarHostState = remember { SnackbarHostState() }
         val allLeaguesUiState by viewModel.allLeaguesUiState.collectAsStateWithLifecycle()
         val teamsByLeagueUiState by viewModel.teamsByLeagueUiState.collectAsStateWithLifecycle()
+        val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+        val suggestionList by viewModel.suggestionList.collectAsStateWithLifecycle()
 
         if (teamsByLeagueUiState is TeamsByLeagueUiState.Loading || allLeaguesUiState is AllLeaguesUiState.Loading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center).width(64.dp))
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center).width(Dimensions.loaderSize))
         }
         ManageTeamsByLeagueUiState(
             teamsByLeagueUiState = teamsByLeagueUiState,
@@ -41,8 +43,12 @@ fun MainActivityScreen(
         )
         ManageAllLeaguesUiState(
             allLeaguesUiState = allLeaguesUiState,
+            searchQuery = searchQuery,
+            suggestionList = suggestionList,
             onError = { ShowSnackBar(snackBarHostState, it ?: "") },
             onItemClick = { viewModel.getTeamsByLeague(leagueName = it) },
+            onSearchQueryChange = { viewModel.updateSearchQuery(it) },
+            onClearSearchQueryClick = { viewModel.clearSearchQuery() },
         )
         SnackbarHost(
             hostState = snackBarHostState,
@@ -75,15 +81,22 @@ private fun ManageTeamsByLeagueUiState(
 @Composable
 private fun ManageAllLeaguesUiState(
     allLeaguesUiState: AllLeaguesUiState,
+    searchQuery: String,
+    suggestionList: List<String>,
+    onSearchQueryChange: (String) -> Unit,
+    onClearSearchQueryClick: () -> Unit,
     onError: @Composable (String?) -> Unit,
     onItemClick: (String) -> Unit,
 ) {
     when (allLeaguesUiState) {
         is AllLeaguesUiState.Success -> {
             AutoCompleteTextField(
-                suggestionList = allLeaguesUiState.data.map { it.name },
+                searchQuery = searchQuery,
+                suggestionList = suggestionList,//allLeaguesUiState.data,
                 onItemClick = { onItemClick(it) },
                 suggestionItem = { Text(text = it) },
+                onSearchQueryChange = { onSearchQueryChange(it) },
+                onClearSearchQueryClick = { onClearSearchQueryClick() },
             )
         }
 

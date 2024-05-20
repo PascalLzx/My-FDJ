@@ -2,7 +2,7 @@ package com.lzx.myfdj.domain.usecase
 
 import com.lzx.myfdj.domain.model.League
 import com.lzx.myfdj.domain.repository.LeagueRepository
-import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
@@ -19,7 +19,7 @@ class GetAllLeaguesUseCaseTest {
         val tested = GetAllLeaguesUseCase(leagueRepository)
         val expectedLeagues = listOf(League(id = "1", name = "League 1"))
         val resultFlow = flowOf(expectedLeagues)
-        coEvery { leagueRepository.getAllLeagues() } returns resultFlow
+        every { leagueRepository.getAllLeagues() } returns resultFlow
 
         // When
         val result = tested().first()

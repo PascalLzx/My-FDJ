@@ -11,7 +11,7 @@ import com.lzx.myfdj.presentation.main.model.AllLeaguesUiState
 import com.lzx.myfdj.presentation.main.model.TeamsByLeagueUiState
 import com.lzx.myfdj.presentation.util.MainDispatcherTestRule
 import io.mockk.clearAllMocks
-import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
@@ -89,7 +89,7 @@ class MainViewModelTest {
     @Test
     fun `test init state TeamsByLeagueUiState`() = runTest {
         // given
-        coEvery { getTeamsByLeagueUseCase("Premier League") } returns mockk()
+        every { getTeamsByLeagueUseCase("Premier League") } returns mockk()
 
         // then
         assertEquals(tested.teamsByLeagueUiState.first(), TeamsByLeagueUiState.Init)
@@ -101,7 +101,7 @@ class MainViewModelTest {
         val leagueName = "Premier League"
         val expectedTeams = listOf(Team(id = "1", name = "Team 1", badgeUrl = ""))
         val resultFlow: Flow<List<Team>> = flowOf(expectedTeams)
-        coEvery { getTeamsByLeagueUseCase(leagueName) } returns resultFlow
+        every { getTeamsByLeagueUseCase(leagueName) } returns resultFlow
 
         // When
         tested.getTeamsByLeague(leagueName)

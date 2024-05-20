@@ -9,6 +9,7 @@ import com.lzx.myfdj.data.mapper.LeagueMapper
 import com.lzx.myfdj.domain.model.League
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
@@ -48,10 +49,10 @@ class LeagueRemoteDataSourceImplTest {
                 LeagueDto("2", name = "League 2"),
             ),
         )
-        coEvery { mockResponse.body() } returns mockLeaguesDataDto
-        coEvery { mockResponse.isSuccessful } returns true
+        every { mockResponse.body() } returns mockLeaguesDataDto
+        every { mockResponse.isSuccessful } returns true
         val mockMappedLeague = mockk<League>()
-        coEvery { leagueMapper.map(any()) } returns mockMappedLeague
+        every { leagueMapper.map(any()) } returns mockMappedLeague
 
         // when
         val result = tested.getAllLeagues()
@@ -71,12 +72,12 @@ class LeagueRemoteDataSourceImplTest {
                 LeagueDto("1", name = "League 2"),
             ),
         )
-        coEvery { mockResponse.body() } returns mockLeaguesDataDto
-        coEvery { mockResponse.isSuccessful } returns false
-        coEvery { mockResponse.code() } returns 403
-        coEvery { mockResponse.errorBody() } returns null
+        every { mockResponse.body() } returns mockLeaguesDataDto
+        every { mockResponse.isSuccessful } returns false
+        every { mockResponse.code() } returns 403
+        every { mockResponse.errorBody() } returns null
         val mockMappedLeague = mockk<League>()
-        coEvery { leagueMapper.map(any()) } returns mockMappedLeague
+        every { leagueMapper.map(any()) } returns mockMappedLeague
 
         // when
         val result = assertFails {

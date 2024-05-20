@@ -4,7 +4,7 @@ import com.lzx.myfdj.data.api.TheSportsDbApi
 import com.lzx.myfdj.data.api.model.TeamDto
 import com.lzx.myfdj.data.api.model.TeamsDataDto
 import com.lzx.myfdj.data.datasource.team.TeamRemoteDataSourceImpl
-import com.lzx.myfdj.data.exception.ApiException
+import com.lzx.myfdj.data.exception.MyFdjException
 import com.lzx.myfdj.data.mapper.TeamMapper
 import com.lzx.myfdj.domain.model.Team
 import io.mockk.clearAllMocks
@@ -82,6 +82,6 @@ class TeamRemoteDataSourceImplTest {
         }
 
         // then
-        assert(result is ApiException)
+        assert(result is MyFdjException)
     }
 }
